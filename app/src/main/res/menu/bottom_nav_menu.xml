@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/assets"
+        android:title="@string/assets"
+        android:icon="@drawable/icon_assets"
+        />
+    <item
+        android:id="@+id/transactions"
+        android:title="@string/transactions"
+        android:icon="@drawable/icon_transactions"
+        />
+    <item
+        android:id="@+id/home"
+        android:title="@string/home_icon"
+        android:icon="@drawable/icon_home"
+        />
+    <item
+        android:id="@+id/history"
+        android:title="@string/history"
+        android:icon="@drawable/icon_history"
+        />
+    <item
+        android:id="@+id/budget"
+        android:title="@string/budget"
+        android:icon="@drawable/icon_budget"
+        />
+
+</menu>
