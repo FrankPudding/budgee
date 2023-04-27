@@ -9,28 +9,20 @@ import androidx.room.RoomDatabase
 abstract class AppDatabase : RoomDatabase() {
     abstract fun assetTypeDao() : AssetTypeDao
 
-    companion object{
-
+    companion object {
         @Volatile
         private var INSTANCE : AppDatabase? = null
 
         fun getDatabase(context: Context): AppDatabase{
-
-            val tempInstance = INSTANCE
-            if(tempInstance != null){
-                return tempInstance
-            }
-            synchronized(this){
+            return INSTANCE ?: synchronized(this){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 return instance
             }
-
         }
-
     }
 }
