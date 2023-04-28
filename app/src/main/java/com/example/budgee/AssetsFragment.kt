@@ -26,8 +26,6 @@ class AssetsFragment : Fragment() {
     private lateinit var tabs: TabLayout
     private var assetTypes: ArrayList<AssetType> = arrayListOf()
 
-    lateinit var binding : FragmentAssetsBinding
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,6 +51,7 @@ class AssetsFragment : Fragment() {
                 for (assetType in assetTypes.sortedBy { it.position }) {
                     tabs.addTab(tabs.newTab().setText(assetType.name))
                 }
+                defineTabLongClickListeners()
             }
         }
 
@@ -131,5 +130,16 @@ class AssetsFragment : Fragment() {
         }
         assetTypes.add(newAssetType)
         tabs.addTab(tabs.newTab().setText(newAssetType.name))
+        defineTabLongClickListeners()
+    }
+
+    private fun defineTabLongClickListeners() {
+        for (i in 0 until tabs.tabCount) {
+            val tab = tabs.getTabAt(i)
+            tab?.view?.setOnLongClickListener {
+                tabs.removeTab(tab)
+                true
+            }
+        }
     }
 }
