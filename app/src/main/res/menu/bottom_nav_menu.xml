@@ -4,27 +4,27 @@
     <item
         android:id="@+id/assets"
         android:title="@string/assets"
-        android:icon="@drawable/icon_assets"
+        android:icon="@drawable/ic_assets"
         />
     <item
         android:id="@+id/transactions"
         android:title="@string/transactions"
-        android:icon="@drawable/icon_transactions"
+        android:icon="@drawable/ic_transactions"
         />
     <item
         android:id="@+id/home"
         android:title="@string/home_icon"
-        android:icon="@drawable/icon_home"
+        android:icon="@drawable/ic_home"
         />
     <item
         android:id="@+id/history"
         android:title="@string/history"
-        android:icon="@drawable/icon_history"
+        android:icon="@drawable/ic_history"
         />
     <item
         android:id="@+id/budget"
         android:title="@string/budget"
-        android:icon="@drawable/icon_budget"
+        android:icon="@drawable/ic_budget"
         />
 
 </menu>

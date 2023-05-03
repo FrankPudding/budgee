@@ -137,9 +137,39 @@ class AssetsFragment : Fragment() {
         for (i in 0 until tabs.tabCount) {
             val tab = tabs.getTabAt(i)
             tab?.view?.setOnLongClickListener {
-                tabs.removeTab(tab)
+                showEditAssetTypeDialog(assetType = assetTypes[i])
                 true
             }
         }
+    }
+
+    private fun showEditAssetTypeDialog(assetType: AssetType) {
+        val builder = AlertDialog.Builder(this.context)
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.dialog_edit_asset_type, null)
+        builder.setView(dialogView)
+        val dialog = builder.create()
+
+        val titleTextView = dialogView.findViewById<TextView>(R.id.assets_edit_asset_type)
+        titleTextView.setText(getString(R.string.assets_edit_asset_type_title, assetType.name))
+
+
+        val deleteButton = dialogView.findViewById<Button>(R.id.assets_edit_asset_type_delete_button)
+        deleteButton.setOnClickListener {
+            GlobalScope.launch(Dispatchers.IO) {
+                appDb.assetTypeDao().delete(assetType)
+            }
+            val index = assetTypes.indexOf(assetType)
+            assetTypes.removeAt(index)
+            tabs.removeTabAt(index)
+            dialog.dismiss()
+        }
+
+        val cancelButton = dialogView.findViewById<Button>(R.id.assets_edit_asset_type_cancel_button)
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }
