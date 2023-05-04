@@ -81,16 +81,23 @@ class AssetsFragment : Fragment() {
 
     private fun addButtonCLickListener(view: View) {
         val addAssetTypeButton = view.findViewById<Button>(R.id.assets_add_asset_type_button)
+        val rootView = view.findViewById<View>(R.id.assets_constraint_layout)
         if (addAssetTypeButton.visibility == View.GONE) {
             val slideUp = AnimationUtils.loadAnimation(this.context, R.anim.slide_up)
             addAssetTypeButton.visibility = View.VISIBLE
             addAssetTypeButton.startAnimation(slideUp)
             addAssetTypeButton.setOnClickListener {addAssetTypeClickListener(view)}
+            rootView.setOnClickListener {
+                val slideDown = AnimationUtils.loadAnimation(this.context, R.anim.slide_down)
+                addAssetTypeButton.visibility = View.GONE
+                addAssetTypeButton.startAnimation(slideDown)
+            }
         }
         else {
             val slideDown = AnimationUtils.loadAnimation(this.context, R.anim.slide_down)
             addAssetTypeButton.visibility = View.GONE
             addAssetTypeButton.startAnimation(slideDown)
+            rootView.setOnClickListener(null)
         }
     }
 
