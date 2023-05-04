@@ -156,13 +156,19 @@ class AssetsFragment : Fragment() {
 
         val deleteButton = dialogView.findViewById<Button>(R.id.assets_edit_asset_type_delete_button)
         deleteButton.setOnClickListener {
-            GlobalScope.launch(Dispatchers.IO) {
-                appDb.assetTypeDao().delete(assetType)
+            if (assetTypes.size == 1) {
+                Toast.makeText(this.context, "Must have at least one tab", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
             }
-            val index = assetTypes.indexOf(assetType)
-            assetTypes.removeAt(index)
-            tabs.removeTabAt(index)
-            dialog.dismiss()
+            else {
+                GlobalScope.launch(Dispatchers.IO) {
+                    appDb.assetTypeDao().delete(assetType)
+                }
+                val index = assetTypes.indexOf(assetType)
+                assetTypes.removeAt(index)
+                tabs.removeTabAt(index)
+                dialog.dismiss()
+            }
         }
 
         val cancelButton = dialogView.findViewById<Button>(R.id.assets_edit_asset_type_cancel_button)
