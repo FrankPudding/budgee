@@ -13,7 +13,7 @@
         android:background="@color/white"
         tools:context=".MainActivity">
 
-        <com.google.android.material.tabs.TabLayout
+        <com.example.budgee.layouts.ScrollableTabLayout
             android:id="@+id/asset_tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tabBackground="@color/white"
             app:tabGravity="fill"
-            app:tabMode="fixed"
+            app:tabMode="scrollable"
             app:tabSelectedTextColor="@color/green"
             app:tabTextColor="@color/green" />
 
@@ -33,39 +33,39 @@
             android:textColor="@color/green"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/asset_tabs"/>
+            app:layout_constraintTop_toBottomOf="@+id/asset_tabs" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/assets_add_button"
-            android:background="@drawable/shape_circle"
-            android:layout_gravity="center"
-            android:layout_height="64dp"
             android:layout_width="64dp"
-            android:layout_marginBottom="95dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
             android:layout_marginEnd="20dp"
+            android:layout_marginBottom="95dp"
+            android:background="@drawable/shape_circle"
             app:icon="@drawable/ic_add"
             app:iconSize="32dp"
             app:iconTint="@color/white"
             app:layout_constraintBottom_toBottomOf="@+id/assets_constraint_layout"
-            app:layout_constraintEnd_toEndOf="@+id/assets_constraint_layout"/>
+            app:layout_constraintEnd_toEndOf="@+id/assets_constraint_layout" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/assets_add_asset_type_button"
-            android:background="@drawable/shape_rounded_rectangle"
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_marginBottom="15dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginEnd="20dp"
-            android:paddingBottom="0px"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/shape_rounded_rectangle"
             android:paddingTop="0px"
+            android:paddingBottom="0px"
             android:text="@string/assets_add_asset_type"
             android:textAllCaps="false"
             android:textColor="#000000"
             android:visibility="gone"
             app:backgroundTint="@color/yellow"
             app:layout_constraintBottom_toTopOf="@+id/assets_add_button"
-            app:layout_constraintEnd_toEndOf="@+id/assets_constraint_layout"/>
+            app:layout_constraintEnd_toEndOf="@+id/assets_constraint_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
