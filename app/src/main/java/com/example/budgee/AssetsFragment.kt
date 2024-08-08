@@ -11,7 +11,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.budgee.databinding.FragmentAssetsBinding
 import com.example.budgee.db.AppDatabase
 import com.example.budgee.db.AssetType
 import com.google.android.material.tabs.TabLayout
@@ -19,10 +18,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.UUID
 
 class AssetsFragment : Fragment() {
-    private lateinit var appDb : AppDatabase
+    private lateinit var appDb: AppDatabase
     private lateinit var tabs: TabLayout
     private var assetTypes: ArrayList<AssetType> = arrayListOf()
 
@@ -40,8 +39,8 @@ class AssetsFragment : Fragment() {
             assetTypes = ArrayList(assetTypesFromDb)
             if (assetTypes.isEmpty()) {
                 assetTypes = arrayListOf(
-                    AssetType(id=UUID.randomUUID(), name="Assets", position=1),
-                    AssetType(id=UUID.randomUUID(), name="Liabilities", position=2)
+                    AssetType(id = UUID.randomUUID(), name = "Assets", position = 1),
+                    AssetType(id = UUID.randomUUID(), name = "Liabilities", position = 2)
                 )
                 for (assetType in assetTypes) {
                     appDb.assetTypeDao().insert(assetType)
@@ -51,7 +50,7 @@ class AssetsFragment : Fragment() {
                 for (assetType in assetTypes.sortedBy { it.position }) {
                     tabs.addTab(tabs.newTab().setText(assetType.name))
                 }
-                defineTabLongClickListeners()
+                defineTabLongClickListeners(view = view)
             }
         }
 
@@ -67,6 +66,7 @@ class AssetsFragment : Fragment() {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 textView.text = tab.text
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
@@ -76,32 +76,27 @@ class AssetsFragment : Fragment() {
 
     private fun defineAddButton(view: View) {
         val addButton = view.findViewById<Button>(R.id.assets_add_button)
-        addButton.setOnClickListener {addButtonCLickListener(view)}
+        addButton.setOnClickListener { onClickListenerForAddButton(view) }
     }
 
-    private fun addButtonCLickListener(view: View) {
+    private fun onClickListenerForAddButton(view: View) {
         val addAssetTypeButton = view.findViewById<Button>(R.id.assets_add_asset_type_button)
         val rootView = view.findViewById<View>(R.id.assets_constraint_layout)
         if (addAssetTypeButton.visibility == View.GONE) {
             val slideUp = AnimationUtils.loadAnimation(this.context, R.anim.slide_up)
             addAssetTypeButton.visibility = View.VISIBLE
             addAssetTypeButton.startAnimation(slideUp)
-            addAssetTypeButton.setOnClickListener {addAssetTypeClickListener(view)}
+            addAssetTypeButton.setOnClickListener { onClickListenerForAddAssetTypeButton(view) }
             rootView.setOnClickListener {
-                val slideDown = AnimationUtils.loadAnimation(this.context, R.anim.slide_down)
-                addAssetTypeButton.visibility = View.GONE
-                addAssetTypeButton.startAnimation(slideDown)
+                hideAddAssetTypeButton(view)
             }
-        }
-        else {
-            val slideDown = AnimationUtils.loadAnimation(this.context, R.anim.slide_down)
-            addAssetTypeButton.visibility = View.GONE
-            addAssetTypeButton.startAnimation(slideDown)
-            rootView.setOnClickListener(null)
+        } else {
+            hideAddAssetTypeButton(view)
         }
     }
 
-    private fun addAssetTypeClickListener(view: View) {
+    private fun onClickListenerForAddAssetTypeButton(view: View) {
+        hideAddAssetTypeButton(view)
         showAddAssetDialog(view)
     }
 
@@ -117,9 +112,9 @@ class AssetsFragment : Fragment() {
 
             val newPosition = assetTypes.maxByOrNull { it.position }!!.position + 1
             val newAssetType = AssetType(
-                id=UUID.randomUUID(), name=text, position=newPosition
+                id = UUID.randomUUID(), name = text, position = newPosition
             )
-            addAssetType(newAssetType)
+            addAssetType(view = view, newAssetType = newAssetType)
             dialog.dismiss()
         }
 
@@ -131,19 +126,20 @@ class AssetsFragment : Fragment() {
         dialog.show()
     }
 
-    private fun addAssetType(newAssetType: AssetType) {
+    private fun addAssetType(view: View, newAssetType: AssetType) {
         GlobalScope.launch(Dispatchers.IO) {
             appDb.assetTypeDao().insert(newAssetType)
         }
         assetTypes.add(newAssetType)
         tabs.addTab(tabs.newTab().setText(newAssetType.name))
-        defineTabLongClickListeners()
+        defineTabLongClickListeners(view = view)
     }
 
-    private fun defineTabLongClickListeners() {
+    private fun defineTabLongClickListeners(view: View) {
         for (i in 0 until tabs.tabCount) {
             val tab = tabs.getTabAt(i)
             tab?.view?.setOnLongClickListener {
+                hideAddAssetTypeButton(view)
                 showEditAssetTypeDialog(assetType = assetTypes[i])
                 true
             }
@@ -161,13 +157,14 @@ class AssetsFragment : Fragment() {
         titleTextView.setText(getString(R.string.assets_edit_asset_type_title, assetType.name))
 
 
-        val deleteButton = dialogView.findViewById<Button>(R.id.assets_edit_asset_type_delete_button)
+        val deleteButton =
+            dialogView.findViewById<Button>(R.id.assets_edit_asset_type_delete_button)
         deleteButton.setOnClickListener {
             if (assetTypes.size == 1) {
-                Toast.makeText(this.context, "Must have at least one tab", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this.context, "Must have at least one tab", Toast.LENGTH_SHORT)
+                    .show()
                 dialog.dismiss()
-            }
-            else {
+            } else {
                 GlobalScope.launch(Dispatchers.IO) {
                     appDb.assetTypeDao().delete(assetType)
                 }
@@ -178,11 +175,24 @@ class AssetsFragment : Fragment() {
             }
         }
 
-        val cancelButton = dialogView.findViewById<Button>(R.id.assets_edit_asset_type_cancel_button)
+        val cancelButton =
+            dialogView.findViewById<Button>(R.id.assets_edit_asset_type_cancel_button)
         cancelButton.setOnClickListener {
             dialog.dismiss()
         }
 
         dialog.show()
+    }
+
+    private fun hideAddAssetTypeButton(view: View) {
+        val addAssetTypeButton = view.findViewById<Button>(R.id.assets_add_asset_type_button)
+        if (addAssetTypeButton.visibility == View.GONE) {
+            return
+        }
+        val rootView = view.findViewById<View>(R.id.assets_constraint_layout)
+        val slideDown = AnimationUtils.loadAnimation(this.context, R.anim.slide_down)
+        addAssetTypeButton.visibility = View.GONE
+        addAssetTypeButton.startAnimation(slideDown)
+        rootView.setOnClickListener(null)
     }
 }
