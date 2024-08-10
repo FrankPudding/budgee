@@ -11,5 +11,7 @@
     <string name="history">History</string>
 
     <string name="assets_add_asset_type">Add Asset Type</string>
-    <string name="assets_edit_asset_type_title">Are you sure you want to delete the %s tab?</string>
+    <string name="assets_edit_asset_type_title">%s</string>
+    <string name="edit_tab_name">Edit Tab Name</string>
+    <string name="delete_tab">Delete Tab</string>
 </resources>

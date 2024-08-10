@@ -2,62 +2,61 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/shape_bottom_sheet_dialog"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingLeft="16dp"
+    android:paddingTop="8dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="16dp">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="12dp"
+        android:background="@android:color/darker_gray" />
 
     <TextView
-        android:id="@+id/assets_edit_asset_type"
+        android:id="@+id/assets_edit_asset_type_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:text="@string/assets_edit_asset_type_title"
+        android:textColor="@color/dark_grey"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="8dp"
+        android:background="@android:color/darker_gray" />
+
+    <com.google.android.material.button.MaterialButton xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/assets_edit_asset_type_edit_name_button"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/assets_edit_asset_type_title" />
+        android:text="@string/edit_tab_name"
+        android:textAlignment="textStart"
+        android:textColor="@color/dark_grey"
+        app:icon="@drawable/ic_edit"
+        app:iconGravity="start"
+        app:iconPadding="8dp"
+        app:iconTint="@color/dark_grey" />
 
-    <LinearLayout
+    <com.google.android.material.button.MaterialButton xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/assets_edit_asset_type_delete_button"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp">
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="0.2"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/assets_edit_asset_type_cancel_button"
-            android:layout_height="64dp"
-            android:layout_width="64dp"
-            android:background="@drawable/shape_circle"
-            android:layout_gravity="center"
-            app:backgroundTint="@color/light_grey"
-            app:icon="@drawable/ic_cancel"
-            app:iconSize="32dp"
-            app:iconTint="@color/dark_grey"/>
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="0.4"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/assets_edit_asset_type_delete_button"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_gravity="center"
-            android:layout_marginEnd="20dp"
-            android:background="@drawable/shape_circle"
-            app:backgroundTint="@color/red"
-            app:icon="@drawable/ic_delete"
-            app:iconSize="32dp"
-            app:iconTint="@color/white"
-            app:layout_constraintEnd_toEndOf="@+id/assets_edit_asset_type" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="0.2"/>
-
-    </LinearLayout>
+        android:layout_marginTop="8dp"
+        android:text="@string/delete_tab"
+        android:textAlignment="textStart"
+        android:textColor="@color/dark_grey"
+        app:icon="@drawable/ic_delete"
+        app:iconGravity="start"
+        app:iconPadding="8dp"
+        app:iconTint="@color/dark_grey" />
 
 </LinearLayout>

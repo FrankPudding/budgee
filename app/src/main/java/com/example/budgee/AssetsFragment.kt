@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.budgee.db.AppDatabase
 import com.example.budgee.db.AssetType
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -26,8 +27,7 @@ class AssetsFragment : Fragment() {
     private var assetTypes: ArrayList<AssetType> = arrayListOf()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_assets, container, false)
 
@@ -147,22 +147,20 @@ class AssetsFragment : Fragment() {
     }
 
     private fun showEditAssetTypeDialog(assetType: AssetType) {
-        val builder = AlertDialog.Builder(this.context)
-        val inflater = layoutInflater
-        val dialogView = inflater.inflate(R.layout.dialog_edit_asset_type, null)
-        builder.setView(dialogView)
-        val dialog = builder.create()
 
-        val titleTextView = dialogView.findViewById<TextView>(R.id.assets_edit_asset_type)
-        titleTextView.setText(getString(R.string.assets_edit_asset_type_title, assetType.name))
-
+        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_asset_type, null)
+        val dialog = BottomSheetDialog(this.requireContext(), R.style.BottomSheetDialogTheme)
+        dialog.setContentView(dialogView)
+        val titleTextView = dialogView.findViewById<TextView>(R.id.assets_edit_asset_type_title)
+        titleTextView.text = getString(R.string.assets_edit_asset_type_title, assetType.name)
 
         val deleteButton =
             dialogView.findViewById<Button>(R.id.assets_edit_asset_type_delete_button)
         deleteButton.setOnClickListener {
             if (assetTypes.size == 1) {
-                Toast.makeText(this.context, "Must have at least one tab", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(
+                    this.context, "You can't delete your only tab!", Toast.LENGTH_SHORT
+                ).show()
                 dialog.dismiss()
             } else {
                 GlobalScope.launch(Dispatchers.IO) {
@@ -171,14 +169,10 @@ class AssetsFragment : Fragment() {
                 val index = assetTypes.indexOf(assetType)
                 assetTypes.removeAt(index)
                 tabs.removeTabAt(index)
+                Toast.makeText(this.context, "${assetType.name} deleted!", Toast.LENGTH_SHORT)
+                    .show()
                 dialog.dismiss()
             }
-        }
-
-        val cancelButton =
-            dialogView.findViewById<Button>(R.id.assets_edit_asset_type_cancel_button)
-        cancelButton.setOnClickListener {
-            dialog.dismiss()
         }
 
         dialog.show()
