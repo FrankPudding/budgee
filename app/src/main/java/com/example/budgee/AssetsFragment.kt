@@ -32,10 +32,13 @@ class AssetsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         rootView = inflater.inflate(R.layout.fragment_assets, container, false)
-
         appDb = AppDatabase.getDatabase(requireActivity())
-
         tabs = rootView.findViewById(R.id.asset_tabs)
+        updateTabs()
+        return rootView
+    }
+
+    private fun updateTabs() {
         viewLifecycleOwner.lifecycleScope.launch {
             val assetTypesFromDb = appDb.assetTypeDao().getAll()
             assetTypes = ArrayList(assetTypesFromDb)
@@ -49,14 +52,13 @@ class AssetsFragment : Fragment() {
                 }
             }
             withContext(Dispatchers.Main) {
+                tabs.removeAllTabs()
                 for (assetType in assetTypes.sortedBy { it.position }) {
                     tabs.addTab(tabs.newTab().setText(assetType.name))
                 }
                 defineTabLongClickListeners()
             }
         }
-
-        return rootView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -116,6 +118,7 @@ class AssetsFragment : Fragment() {
                 id = UUID.randomUUID(), name = text, position = newPosition
             )
             addAssetType(newAssetType = newAssetType)
+            updateTabs()
             dialog.dismiss()
         }
 
@@ -130,10 +133,10 @@ class AssetsFragment : Fragment() {
     private fun addAssetType(newAssetType: AssetType) {
         viewLifecycleOwner.lifecycleScope.launch {
             appDb.assetTypeDao().insert(newAssetType)
+            withContext(Dispatchers.Main) {
+                updateTabs()
+            }
         }
-        assetTypes.add(newAssetType)
-        tabs.addTab(tabs.newTab().setText(newAssetType.name))
-        defineTabLongClickListeners()
     }
 
     private fun defineTabLongClickListeners() {
@@ -165,11 +168,11 @@ class AssetsFragment : Fragment() {
                 dialog.dismiss()
             } else {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    appDb.assetTypeDao().delete(assetType)
+                    appDb.assetTypeDao().deleteAndUpdatePositions(assetType)
+                    withContext(Dispatchers.Main) {
+                        updateTabs()
+                    }
                 }
-                val index = assetTypes.indexOf(assetType)
-                assetTypes.removeAt(index)
-                tabs.removeTabAt(index)
                 Toast.makeText(this.context, "${assetType.name} deleted!", Toast.LENGTH_SHORT)
                     .show()
                 dialog.dismiss()
@@ -209,8 +212,10 @@ class AssetsFragment : Fragment() {
             tabs.getTabAt(assetType.position)?.setText(assetType.name)
             viewLifecycleOwner.lifecycleScope.launch {
                 appDb.assetTypeDao().update(assetType)
+                withContext(Dispatchers.Main) {
+                    dialog.dismiss()
+                }
             }
-            dialog.dismiss()
         }
 
         builder.setNegativeButton("Cancel") { dialog, _ ->

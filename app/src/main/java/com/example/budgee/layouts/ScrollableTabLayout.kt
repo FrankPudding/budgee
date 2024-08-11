@@ -13,6 +13,15 @@ constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        setTabWidth()
+    }
+
+    override fun addTab(tab: Tab, position: Int, setSelected: Boolean) {
+        super.addTab(tab, position, setSelected)
+        setTabWidth()
+    }
+
+    private fun setTabWidth() {
         val tabCount = tabCount
         val screenWidth = measuredWidth
         if (tabCount > 0) {
