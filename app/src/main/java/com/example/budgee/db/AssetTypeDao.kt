@@ -1,6 +1,9 @@
 package com.example.budgee.db
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
 
 @Dao
 interface AssetTypeDao {
@@ -10,7 +13,7 @@ interface AssetTypeDao {
     @Query("SELECT * FROM asset_types WHERE name LIKE :name LIMIT 1")
     suspend fun findByName(name: String): AssetType
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert
     suspend fun insert(assetType: AssetType)
 
     @Delete

@@ -11,12 +11,12 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.budgee.db.AppDatabase
 import com.example.budgee.db.AssetType
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -34,7 +34,7 @@ class AssetsFragment : Fragment() {
         appDb = AppDatabase.getDatabase(requireActivity())
 
         tabs = view.findViewById(R.id.asset_tabs)
-        GlobalScope.launch(Dispatchers.IO) {
+        viewLifecycleOwner.lifecycleScope.launch {
             val assetTypesFromDb = appDb.assetTypeDao().getAll()
             assetTypes = ArrayList(assetTypesFromDb)
             if (assetTypes.isEmpty()) {
@@ -127,7 +127,7 @@ class AssetsFragment : Fragment() {
     }
 
     private fun addAssetType(view: View, newAssetType: AssetType) {
-        GlobalScope.launch(Dispatchers.IO) {
+        viewLifecycleOwner.lifecycleScope.launch {
             appDb.assetTypeDao().insert(newAssetType)
         }
         assetTypes.add(newAssetType)
@@ -147,7 +147,6 @@ class AssetsFragment : Fragment() {
     }
 
     private fun showEditAssetTypeDialog(assetType: AssetType) {
-
         val dialogView = layoutInflater.inflate(R.layout.dialog_edit_asset_type, null)
         val dialog = BottomSheetDialog(this.requireContext(), R.style.BottomSheetDialogTheme)
         dialog.setContentView(dialogView)
@@ -163,7 +162,7 @@ class AssetsFragment : Fragment() {
                 ).show()
                 dialog.dismiss()
             } else {
-                GlobalScope.launch(Dispatchers.IO) {
+                viewLifecycleOwner.lifecycleScope.launch {
                     appDb.assetTypeDao().delete(assetType)
                 }
                 val index = assetTypes.indexOf(assetType)
