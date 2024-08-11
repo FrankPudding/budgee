@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.budgee.db.AppDatabase
@@ -22,25 +23,26 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class AssetsFragment : Fragment() {
+    private lateinit var rootView: View
     private lateinit var appDb: AppDatabase
     private lateinit var tabs: TabLayout
     private var assetTypes: ArrayList<AssetType> = arrayListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_assets, container, false)
+    ): View {
+        rootView = inflater.inflate(R.layout.fragment_assets, container, false)
 
         appDb = AppDatabase.getDatabase(requireActivity())
 
-        tabs = view.findViewById(R.id.asset_tabs)
+        tabs = rootView.findViewById(R.id.asset_tabs)
         viewLifecycleOwner.lifecycleScope.launch {
             val assetTypesFromDb = appDb.assetTypeDao().getAll()
             assetTypes = ArrayList(assetTypesFromDb)
             if (assetTypes.isEmpty()) {
                 assetTypes = arrayListOf(
-                    AssetType(id = UUID.randomUUID(), name = "Assets", position = 1),
-                    AssetType(id = UUID.randomUUID(), name = "Liabilities", position = 2)
+                    AssetType(id = UUID.randomUUID(), name = "Assets", position = 0),
+                    AssetType(id = UUID.randomUUID(), name = "Liabilities", position = 1)
                 )
                 for (assetType in assetTypes) {
                     appDb.assetTypeDao().insert(assetType)
@@ -50,11 +52,11 @@ class AssetsFragment : Fragment() {
                 for (assetType in assetTypes.sortedBy { it.position }) {
                     tabs.addTab(tabs.newTab().setText(assetType.name))
                 }
-                defineTabLongClickListeners(view = view)
+                defineTabLongClickListeners()
             }
         }
 
-        return view
+        return rootView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,36 +73,35 @@ class AssetsFragment : Fragment() {
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
 
-        defineAddButton(view)
+        defineAddButton()
     }
 
-    private fun defineAddButton(view: View) {
-        val addButton = view.findViewById<Button>(R.id.assets_add_button)
-        addButton.setOnClickListener { onClickListenerForAddButton(view) }
+    private fun defineAddButton() {
+        val addButton = rootView.findViewById<Button>(R.id.assets_add_button)
+        addButton.setOnClickListener { onClickListenerForAddButton() }
     }
 
-    private fun onClickListenerForAddButton(view: View) {
-        val addAssetTypeButton = view.findViewById<Button>(R.id.assets_add_asset_type_button)
-        val rootView = view.findViewById<View>(R.id.assets_constraint_layout)
+    private fun onClickListenerForAddButton() {
+        val addAssetTypeButton = rootView.findViewById<Button>(R.id.assets_add_asset_type_button)
         if (addAssetTypeButton.visibility == View.GONE) {
             val slideUp = AnimationUtils.loadAnimation(this.context, R.anim.slide_up)
             addAssetTypeButton.visibility = View.VISIBLE
             addAssetTypeButton.startAnimation(slideUp)
-            addAssetTypeButton.setOnClickListener { onClickListenerForAddAssetTypeButton(view) }
+            addAssetTypeButton.setOnClickListener { onClickListenerForAddAssetTypeButton() }
             rootView.setOnClickListener {
-                hideAddAssetTypeButton(view)
+                hideAddAssetTypeButton()
             }
         } else {
-            hideAddAssetTypeButton(view)
+            hideAddAssetTypeButton()
         }
     }
 
-    private fun onClickListenerForAddAssetTypeButton(view: View) {
-        hideAddAssetTypeButton(view)
-        showAddAssetDialog(view)
+    private fun onClickListenerForAddAssetTypeButton() {
+        hideAddAssetTypeButton()
+        showAddAssetDialog()
     }
 
-    private fun showAddAssetDialog(view: View) {
+    private fun showAddAssetDialog() {
         val builder = AlertDialog.Builder(this.context)
         builder.setTitle("Add Asset Type")
 
@@ -114,7 +115,7 @@ class AssetsFragment : Fragment() {
             val newAssetType = AssetType(
                 id = UUID.randomUUID(), name = text, position = newPosition
             )
-            addAssetType(view = view, newAssetType = newAssetType)
+            addAssetType(newAssetType = newAssetType)
             dialog.dismiss()
         }
 
@@ -126,20 +127,20 @@ class AssetsFragment : Fragment() {
         dialog.show()
     }
 
-    private fun addAssetType(view: View, newAssetType: AssetType) {
+    private fun addAssetType(newAssetType: AssetType) {
         viewLifecycleOwner.lifecycleScope.launch {
             appDb.assetTypeDao().insert(newAssetType)
         }
         assetTypes.add(newAssetType)
         tabs.addTab(tabs.newTab().setText(newAssetType.name))
-        defineTabLongClickListeners(view = view)
+        defineTabLongClickListeners()
     }
 
-    private fun defineTabLongClickListeners(view: View) {
+    private fun defineTabLongClickListeners() {
         for (i in 0 until tabs.tabCount) {
             val tab = tabs.getTabAt(i)
             tab?.view?.setOnLongClickListener {
-                hideAddAssetTypeButton(view)
+                hideAddAssetTypeButton()
                 showEditAssetTypeDialog(assetType = assetTypes[i])
                 true
             }
@@ -147,7 +148,8 @@ class AssetsFragment : Fragment() {
     }
 
     private fun showEditAssetTypeDialog(assetType: AssetType) {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_asset_type, null)
+        val parent = rootView.findViewById<ConstraintLayout>(R.id.assets_constraint_layout)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_asset_type, parent, false)
         val dialog = BottomSheetDialog(this.requireContext(), R.style.BottomSheetDialogTheme)
         dialog.setContentView(dialogView)
         val titleTextView = dialogView.findViewById<TextView>(R.id.assets_edit_asset_type_title)
@@ -174,18 +176,48 @@ class AssetsFragment : Fragment() {
             }
         }
 
+        val renameButton =
+            dialogView.findViewById<Button>(R.id.assets_edit_asset_type_edit_name_button)
+        renameButton.setOnClickListener {
+            showEditAssetNameDialog(assetType = assetType)
+            dialog.dismiss()
+        }
+
         dialog.show()
     }
 
-    private fun hideAddAssetTypeButton(view: View) {
-        val addAssetTypeButton = view.findViewById<Button>(R.id.assets_add_asset_type_button)
+    private fun hideAddAssetTypeButton() {
+        val addAssetTypeButton = rootView.findViewById<Button>(R.id.assets_add_asset_type_button)
         if (addAssetTypeButton.visibility == View.GONE) {
             return
         }
-        val rootView = view.findViewById<View>(R.id.assets_constraint_layout)
         val slideDown = AnimationUtils.loadAnimation(this.context, R.anim.slide_down)
         addAssetTypeButton.visibility = View.GONE
         addAssetTypeButton.startAnimation(slideDown)
         rootView.setOnClickListener(null)
+    }
+
+    private fun showEditAssetNameDialog(assetType: AssetType) {
+        val builder = AlertDialog.Builder(this.context)
+        builder.setTitle("Rename ${assetType.name}")
+
+        val input = EditText(this.context)
+
+        builder.setView(input)
+        builder.setPositiveButton("Rename") { dialog, _ ->
+            assetType.name = input.text.toString()
+            tabs.getTabAt(assetType.position)?.setText(assetType.name)
+            viewLifecycleOwner.lifecycleScope.launch {
+                appDb.assetTypeDao().update(assetType)
+            }
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 }

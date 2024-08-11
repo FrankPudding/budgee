@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface AssetTypeDao {
@@ -15,6 +16,9 @@ interface AssetTypeDao {
 
     @Insert
     suspend fun insert(assetType: AssetType)
+
+    @Update
+    suspend fun update(assetType: AssetType)
 
     @Delete
     suspend fun delete(assetType: AssetType)
